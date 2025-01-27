@@ -1,4 +1,4 @@
-package com.bishnah.springrestdemo.controller;
+    package com.bishnah.springrestdemo.controller;
 
 import com.bishnah.springrestdemo.model.Account;
 import com.bishnah.springrestdemo.model.Album;
@@ -319,7 +319,7 @@ public class AlbumController {
 
 
     @GetMapping(value = "/albums/{album_id}", produces = "application/json")
-    @ApiResponse(responseCode = "200", description = "List of Albums")
+    @ApiResponse(responseCode = "200", description = "List of Album by Id")
     @ApiResponse(responseCode = "401", description = "Please check Access Token")
     @ApiResponse(responseCode = "403", description = "Token/Scope Error")
     @Operation(summary = "List album by album id")

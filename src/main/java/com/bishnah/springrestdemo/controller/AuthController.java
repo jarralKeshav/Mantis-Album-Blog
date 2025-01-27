@@ -46,21 +46,18 @@ public class AuthController {
     @PostMapping("/token")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<TokenDTO> token(@Valid @RequestBody UserLoginDTO userLogin) throws AuthenticationException {
-        try {           
-            Authentication authentication =
-                    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(),
-                            userLogin.getPassword()));  
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword()));
             return ResponseEntity.ok(new TokenDTO(tokenService.generateToken(authentication)));
         } catch (Exception e) {
-            log.debug(AccountError.TOKEN_GENERATION_ERROR.toString()+" "+ e.getMessage());
+            log.debug(AccountError.TOKEN_GENERATION_ERROR + " " + e.getMessage());
             return new ResponseEntity<>(new TokenDTO(null), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping(value = "/users/add", produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED) //optional
-    @ApiResponse(responseCode = "401", description = "Please enter a valid email and Password length btw 6 and 20 " +
-            "characters")
+    @ApiResponse(responseCode = "401", description = "Please enter a valid email and Password length btw 6 and 20 " + "characters")
 
     @ApiResponse(responseCode = "200", description = "Account Added")
     @Operation(summary = "Add a new User")
@@ -75,7 +72,7 @@ public class AuthController {
             return ResponseEntity.ok(AccountSuccess.ACCOUNT_ADDED.toString());
 
         } catch (Exception e) {
-            log.debug(AccountError.ADD_ACCOUNT_ERROR.toString() + " " + e.getMessage());
+            log.debug(AccountError.ADD_ACCOUNT_ERROR + " " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
         }
@@ -91,27 +88,25 @@ public class AuthController {
     @SecurityRequirement(name = "Spring-Demo-Api")
     public List<AccountViewDTO> Users() {
         List<AccountViewDTO> accountViewDTOS = new ArrayList<>();
-        for (Account account:  accountService.findAllAccounts()){
-            accountViewDTOS.add(new AccountViewDTO(account.getId(),account.getEmail(),account.getAuthorities()));
+        for (Account account : accountService.findAllAccounts()) {
+            accountViewDTOS.add(new AccountViewDTO(account.getId(), account.getEmail(), account.getAuthorities()));
         }
 
         return accountViewDTOS;
 
     }
 
-    @PutMapping(value = "/users/{user_id}/update-authorities", produces = "application/json", consumes = "application" +
-            "/json")
+    @PutMapping(value = "/users/{user_id}/update-authorities", produces = "application/json", consumes = "application" + "/json")
     @ApiResponse(responseCode = "200", description = "Update Authorities")
     @ApiResponse(responseCode = "400", description = "Invalid User")
     @ApiResponse(responseCode = "401", description = "Please check Access Token")
     @ApiResponse(responseCode = "403", description = "Token/Scope Error")
     @Operation(summary = "Update authorities")
     @SecurityRequirement(name = "Spring-Demo-Api")
-    public ResponseEntity<AccountViewDTO> update_authorities(@Valid @RequestBody AuthoritiesDTO authoritiesDTO,
-    @PathVariable Long user_id) {
+    public ResponseEntity<AccountViewDTO> update_authorities(@Valid @RequestBody AuthoritiesDTO authoritiesDTO, @PathVariable Long user_id) {
         Optional<Account> optionalAccount = accountService.findById(user_id);
 
-        if(optionalAccount.isPresent()) {
+        if (optionalAccount.isPresent()) {
             Account account = optionalAccount.get();
             account.setAuthorities(authoritiesDTO.getAuthorities());
             accountService.createAccount(account);
@@ -125,7 +120,6 @@ public class AuthController {
     }
 
 
-
     @GetMapping(value = "/profile", produces = "application/json")
     @ApiResponse(responseCode = "200", description = "View Profile")
     @ApiResponse(responseCode = "401", description = "Please check Access Token")
@@ -133,12 +127,11 @@ public class AuthController {
     @Operation(summary = "View Profile")
     @SecurityRequirement(name = "Spring-Demo-Api")
     public ProfileDTO profile(Authentication authentication) {
-            String email = authentication.getName();
-            Optional<Account> optionalAccount = accountService.findByEmail(email);
-                Account account = optionalAccount.get();
-                ProfileDTO profileDTO = new ProfileDTO(account.getId(), account.getEmail(), account.getAuthorities());
-                return profileDTO;
-
+        String email = authentication.getName();
+        Optional<Account> optionalAccount = accountService.findByEmail(email);
+        Account account = optionalAccount.get();
+        ProfileDTO profileDTO = new ProfileDTO(account.getId(), account.getEmail(), account.getAuthorities());
+        return profileDTO;
 
 
     }
@@ -149,14 +142,14 @@ public class AuthController {
     @ApiResponse(responseCode = "403", description = "Token/Scope Error")
     @Operation(summary = "Update Password")
     @SecurityRequirement(name = "Spring-Demo-Api")
-    public AccountViewDTO update_password(@Valid @RequestBody PasswordDTO passwordDTO,Authentication authentication) {
-            String email = authentication.getName();
-            Optional<Account> optionalAccount = accountService.findByEmail(email);
-                Account account = optionalAccount.get();
-                account.setPassword(passwordDTO.getPassword());
-                accountService.createAccount(account);
-                AccountViewDTO accountViewDTO = new AccountViewDTO(account.getId(), account.getEmail(), account.getAuthorities());
-                return accountViewDTO;
+    public AccountViewDTO update_password(@Valid @RequestBody PasswordDTO passwordDTO, Authentication authentication) {
+        String email = authentication.getName();
+        Optional<Account> optionalAccount = accountService.findByEmail(email);
+        Account account = optionalAccount.get();
+        account.setPassword(passwordDTO.getPassword());
+        accountService.createAccount(account);
+        AccountViewDTO accountViewDTO = new AccountViewDTO(account.getId(), account.getEmail(), account.getAuthorities());
+        return accountViewDTO;
 
     }
 
@@ -168,16 +161,15 @@ public class AuthController {
     @Operation(summary = "Delete Profile")
     @SecurityRequirement(name = "Spring-Demo-Api")
     public ResponseEntity<String> delete_profile(Authentication authentication) {
-            String email = authentication.getName();
-            Optional<Account> optionalAccount = accountService.findByEmail(email);
-            if(optionalAccount.isPresent()) {
-                accountService.deleteById(optionalAccount.get().getId());
-                return ResponseEntity.ok("User deleted successfully");
-            }
+        String email = authentication.getName();
+        Optional<Account> optionalAccount = accountService.findByEmail(email);
+        if (optionalAccount.isPresent()) {
+            accountService.deleteById(optionalAccount.get().getId());
+            return ResponseEntity.ok("User deleted successfully");
+        }
 
 
-
-        return new ResponseEntity<>("Bad Request",HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Bad Request", HttpStatus.BAD_REQUEST);
 
     }
 
